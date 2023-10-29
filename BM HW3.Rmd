@@ -1,0 +1,71 @@
+---
+title: "BW-HW3"
+author: "Yixiao Sun"
+date: "2023-10-26"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+install.packages('MASS')
+library(MASS)
+bw<-data("birthwt")
+?birthwt
+```
+#Problem1
+```{r}
+library(MASS)
+data("birthwt")
+
+mean_weight <- mean(birthwt$lwt)
+sd_weight <- sd(birthwt$lwt)
+n <- length(birthwt$lwt)
+
+ci <- mean_weight + c(-1, 1) * qt(0.975, df = n-1) * (sd_weight / sqrt(n))
+ci
+
+```
+#Problem2
+```{r}
+smokers <- birthwt$lwt[birthwt$smoke == 1]
+non_smokers <- birthwt$lwt[birthwt$smoke == 0]
+
+var_test <- var.test(smokers, non_smokers)
+print(var_test)
+t.test(smokers, non_smokers, var.equal = TRUE, conf.level = 0.90)
+```
+#Problem 3
+```{r}
+p_hat <- mean(birthwt$ht)
+n <- length(birthwt$ht)
+error <- qnorm(0.995) * sqrt(p_hat*(1-p_hat)/n)
+CI_lower_ht <- p_hat - error
+CI_upper_ht <- p_hat + error
+
+cat("99% CI: (", CI_lower_ht, ", ", CI_upper_ht, ")\n")
+
+prop.test(sum(birthwt$ht), n, p = 0.20,conf.level = 0.90, alternative = "less")
+prop_ht <- mean(birthwt$ht)
+n_ht <- length(birthwt$ht)
+
+prop.test(sum(birthwt$ht), n_ht, p = 0.20, alternative = "less",conf.level = 0.90)
+```
+#Problem4
+```{r}
+prop.test(x = c(sum(birthwt$ui[birthwt$smoke == 0]), sum(birthwt$ui[birthwt$smoke == 1])),
+          n = c(sum(birthwt$smoke == 0), sum(birthwt$smoke == 1)), correct = FALSE)
+
+```
+```{r}
+res<-bartlett.test(bwt ~ factor(race), data = birthwt)
+print(res)
+anova_result <- aov(bwt ~ factor(race), data = birthwt)
+summary(anova_result)
+
+TukeyHSD(anova_result)
+
+```
+
